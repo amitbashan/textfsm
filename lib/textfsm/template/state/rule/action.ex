@@ -18,6 +18,8 @@ defmodule TextFSM.Template.State.Rule.Action do
 
   import NimbleParsec
 
+  whitespace = parsec({TextFSM.ParserHelpers, :whitespace})
+
   defcombinatorp(
     :line_action,
     choice([
@@ -49,22 +51,18 @@ defmodule TextFSM.Template.State.Rule.Action do
       )
     )
 
-  line_record_action = choice([line_and_record_actions, line_or_record_action])
+  defcombinatorp(:line_record_action, choice([line_and_record_actions, line_or_record_action]))
 
   next_state =
     parsec({TextFSM.ParserHelpers, :identifier})
     |> unwrap_and_tag(:next_state)
 
   rule_action =
-    concat(
-      optional(line_record_action),
-      optional(
-        concat(
-          ignore(string(" ")),
-          next_state
-        )
-      )
-    )
+    choice([
+      concat(parsec(:line_record_action), concat(whitespace, next_state)),
+      parsec(:line_record_action),
+      next_state
+    ])
 
   defcombinator(:rule_action, rule_action |> post_traverse({:lift, []}))
 

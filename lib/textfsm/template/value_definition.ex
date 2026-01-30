@@ -52,7 +52,7 @@ defmodule TextFSM.Template.ValueDefinition do
       )
     )
 
-  defparsec(
+  defcombinator(
     :value_definition,
     concat(
       ignore(string("Value ")),

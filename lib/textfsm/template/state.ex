@@ -9,30 +9,31 @@ defmodule TextFSM.Template.State do
 
   import NimbleParsec
 
+  whitespace = parsec({TextFSM.ParserHelpers, :whitespace})
+
   newline = parsec({TextFSM.ParserHelpers, :newline})
 
   state_name = parsec({TextFSM.ParserHelpers, :identifier})
 
   rule_line =
     concat(
-      ignore(string("  ")),
+      ignore(times(whitespace, 2)),
       parsec({__MODULE__.Rule, :rule})
     )
 
   rule_lines =
-    repeat(concat(rule_line, choice([newline, eos()])))
+    repeat(
+      concat(
+        newline,
+        rule_line
+      )
+    )
 
-  defparsec(
+  defcombinator(
     :state,
     concat(
       state_name |> unwrap_and_tag(:name),
-      optional(
-        concat(
-          newline,
-          rule_lines
-        )
-      )
-      |> tag(:rules)
+      rule_lines |> tag(:rules)
     )
     |> post_traverse({:lift, []})
   )

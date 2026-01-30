@@ -7,6 +7,11 @@ defmodule TextFSM.ParserHelpers do
   )
 
   defcombinator(
+    :newlines,
+    times(parsec(:newline), min: 1)
+  )
+
+  defcombinator(
     :newline,
     ignore(string("\n"))
   )

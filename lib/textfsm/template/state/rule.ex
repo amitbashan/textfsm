@@ -75,7 +75,7 @@ defmodule TextFSM.Template.State.Rule do
       end
 
     rule = %__MODULE__{
-      regex_tokens: regex_tokens,
+      regex_tokens: [?^ | regex_tokens],
       action: action
     }
 
