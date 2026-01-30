@@ -2,6 +2,11 @@ defmodule TextFSM.ParserHelpers do
   import NimbleParsec
 
   defcombinator(
+    :whitespace,
+    ignore(string(" "))
+  )
+
+  defcombinator(
     :newline,
     ignore(string("\n"))
   )

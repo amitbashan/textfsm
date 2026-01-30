@@ -9,4 +9,79 @@ defmodule TextFSM.Template.ValueDefinition do
           options: [option()],
           regex: Regex.t()
         }
+
+  import NimbleParsec
+
+  whitespace = parsec({TextFSM.ParserHelpers, :whitespace})
+
+  newline = parsec({TextFSM.ParserHelpers, :newline})
+
+  value_name = parsec({TextFSM.ParserHelpers, :identifier})
+
+  defcombinatorp(
+    :value_option,
+    choice([
+      string("Filldown") |> replace(:filldown),
+      string("Key") |> replace(:key),
+      string("Required") |> replace(:required),
+      string("List") |> replace(:list),
+      string("Fillup") |> replace(:fillup)
+    ])
+  )
+
+  value_options =
+    concat(
+      parsec(:value_option),
+      repeat(
+        concat(
+          ignore(string(",")),
+          parsec(:value_option)
+        )
+      )
+    )
+
+  value_regex =
+    concat(
+      ignore(string("(")),
+      concat(
+        repeat(
+          lookahead_not(concat(string(")"), choice([eos(), newline])))
+          |> ascii_char([32..126])
+        ),
+        ignore(string(")"))
+      )
+    )
+
+  defparsec(
+    :value_definition,
+    concat(
+      ignore(string("Value ")),
+      concat(
+        optional(concat(value_options, whitespace))
+        |> tag(:options),
+        concat(
+          value_name |> unwrap_and_tag(:name),
+          concat(
+            whitespace,
+            value_regex |> tag(:regex_tokens)
+          )
+        )
+      )
+    )
+    |> post_traverse({:lift, []})
+  )
+
+  defp lift(rest, args, context, _position, _offset) do
+    name = Keyword.get(args, :name)
+    options = Keyword.get(args, :options)
+    regex_tokens = Keyword.get(args, :regex_tokens)
+
+    value_definition = %__MODULE__{
+      name: name,
+      options: options,
+      regex: regex_tokens |> List.to_string() |> Regex.compile!()
+    }
+
+    {rest, [value_definition], context}
+  end
 end
