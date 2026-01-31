@@ -3,7 +3,8 @@ defmodule TextFSM.Template.Compiler do
   alias Template.State
   alias State.Rule
 
-  def compile_template(%Template{value_definitions: value_definitions, states: states} = template) do
+  @spec compile(Template.t()) :: Template.t()
+  def compile(%Template{value_definitions: value_definitions, states: states} = template) do
     value_to_regex = Map.new(value_definitions, &{&1.name, &1.regex})
     compiled_states = Enum.map(states, &compile_state(value_to_regex, &1))
 
