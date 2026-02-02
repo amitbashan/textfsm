@@ -20,7 +20,7 @@ defmodule TextFSM.ParserHelpers do
     :identifier,
     concat(
       ascii_string([?A..?Z], min: 1),
-      ascii_string([?A..?Z, ?a..?z, ?0..?9], min: 0)
+      ascii_string([?A..?Z, ?a..?z, ?0..?9, ?_..?_], min: 0)
     )
     |> reduce({Enum, :join, []})
   )
