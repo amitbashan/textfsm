@@ -1,18 +1,31 @@
 defmodule TextFSM.Template do
-  @enforce_keys [:value_definitions, :states]
-  defstruct [:value_definitions, :states]
+  @enforce_keys [:value_definitions, :states, :eof_state]
+  defstruct [:value_definitions, :states, :eof_state]
 
   alias __MODULE__.{ValueDefinition, State}
 
+  @type value_name() :: String.t()
+
+  @type eof_state() :: :record | :no_record
+
   @type t() :: %__MODULE__{
           value_definitions: [ValueDefinition.t()],
-          states: [State.t()]
+          states: [State.t()],
+          eof_state: eof_state()
         }
 
-  @spec value_names(t()) :: [String.t()]
+  @spec value_names(t()) :: [value_name()]
   def value_names(%__MODULE__{value_definitions: value_definitions}) do
     value_definitions
     |> Enum.map(& &1.name)
+  end
+
+  @spec value_name_to_definition_map(t()) :: %{value_name() => ValueDefinition.t()}
+  def value_name_to_definition_map(%__MODULE__{value_definitions: value_definitions}) do
+    Map.new(
+      value_definitions,
+      fn vd -> {vd.name, vd} end
+    )
   end
 
   def get_rule(%__MODULE__{states: states}, state, idx) do
@@ -60,7 +73,8 @@ defmodule TextFSM.Template do
 
     template = %__MODULE__{
       value_definitions: value_definitions,
-      states: states
+      states: states,
+      eof_state: :record
     }
 
     {rest, [template], context}
