@@ -23,6 +23,7 @@ defmodule TextFSM.MixProject do
 
   defp deps do
     [
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:nimble_parsec, "~> 1.4"}
     ]
   end
