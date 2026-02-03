@@ -3,8 +3,11 @@ defmodule TextFSM.Template do
   defstruct [:value_definitions, :states, :eof_state]
 
   alias __MODULE__.{ValueDefinition, State}
+  alias State.Rule
 
   @type value_name() :: String.t()
+
+  @type state_name() :: String.t()
 
   @type eof_state() :: :record | :no_record
 
@@ -20,14 +23,7 @@ defmodule TextFSM.Template do
     |> Enum.map(& &1.name)
   end
 
-  @spec value_name_to_definition_map(t()) :: %{value_name() => ValueDefinition.t()}
-  def value_name_to_definition_map(%__MODULE__{value_definitions: value_definitions}) do
-    Map.new(
-      value_definitions,
-      fn vd -> {vd.name, vd} end
-    )
-  end
-
+  @spec get_rule(t(), state_name(), non_neg_integer()) :: nil | Rule.t()
   def get_rule(%__MODULE__{states: states}, state, idx) do
     case Enum.find(states, &(&1.name == state)) do
       nil ->
@@ -71,10 +67,17 @@ defmodule TextFSM.Template do
         end
       )
 
+    eof_state =
+      if Enum.any?(states, &(&1.name == "EOF")) do
+        :no_record
+      else
+        :record
+      end
+
     template = %__MODULE__{
       value_definitions: value_definitions,
       states: states,
-      eof_state: :record
+      eof_state: eof_state
     }
 
     {rest, [template], context}
