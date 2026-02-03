@@ -364,6 +364,7 @@ defmodule TextFSM.Engine.Memory do
   defp populate_fillup_column(column) do
     {_, populated_column} =
       column
+      |> Enum.reverse()
       |> Enum.reduce(
         {nil, []},
         fn value, {fillup_value, column} ->
