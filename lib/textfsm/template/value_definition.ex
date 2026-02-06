@@ -52,7 +52,7 @@ defmodule TextFSM.Template.ValueDefinition do
       )
     )
 
-  defcombinator(
+  defparsec(
     :value_definition,
     concat(
       ignore(string("Value ")),
@@ -68,7 +68,8 @@ defmodule TextFSM.Template.ValueDefinition do
         )
       )
     )
-    |> post_traverse({:lift, []})
+    |> post_traverse({:lift, []}),
+    export_combinator: true
   )
 
   defp lift(rest, args, context, _position, _offset) do

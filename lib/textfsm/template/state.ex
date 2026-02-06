@@ -29,13 +29,14 @@ defmodule TextFSM.Template.State do
       )
     )
 
-  defcombinator(
+  defparsec(
     :state,
     concat(
       state_name |> unwrap_and_tag(:name),
       rule_lines |> tag(:rules)
     )
-    |> post_traverse({:lift, []})
+    |> post_traverse({:lift, []}),
+    export_combinator: true
   )
 
   defp lift(rest, args, context, _position, _offset) do

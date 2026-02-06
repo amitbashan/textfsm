@@ -64,7 +64,7 @@ defmodule TextFSM.Template.State.Rule.Action do
       next_state
     ])
 
-  defcombinator(:rule_action, rule_action |> post_traverse({:lift, []}))
+  defparsec(:rule_action, rule_action |> post_traverse({:lift, []}), export_combinator: true)
 
   defp lift(rest, args, context, _position, _offset) do
     line_action = Keyword.get(args, :line_action, @default_line_action)

@@ -54,7 +54,7 @@ defmodule TextFSM.Template.State.Rule do
   rule_regex =
     repeat(lookahead_not(parsec(:rule_action)) |> parsec(:rule_regex_atom))
 
-  defcombinator(
+  defparsec(
     :rule,
     concat(
       ignore(string("^")),
@@ -63,7 +63,8 @@ defmodule TextFSM.Template.State.Rule do
         optional(parsec(:rule_action)) |> tag(:action)
       )
     )
-    |> post_traverse({:lift, []})
+    |> post_traverse({:lift, []}),
+    export_combinator: true
   )
 
   defp lift(rest, args, context, _position, _offset) do

@@ -8,7 +8,7 @@ defmodule TextFSM.Template.State.Rule.ErrorAction do
 
   import NimbleParsec
 
-  defcombinator(
+  defparsec(
     :error_action,
     concat(
       ignore(string("Error \"")),
@@ -18,7 +18,8 @@ defmodule TextFSM.Template.State.Rule.ErrorAction do
       )
     )
     |> unwrap_and_tag(:error_message)
-    |> post_traverse({:lift, []})
+    |> post_traverse({:lift, []}),
+    export_combinator: true
   )
 
   defp lift(rest, args, context, _position, _offset) do
