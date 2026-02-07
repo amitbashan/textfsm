@@ -1,4 +1,12 @@
 defmodule TextFSM.Template.ValueDefinition do
+  @moduledoc """
+  Represents a Value definition in a TextFSM template.
+
+  A Value definition line looks like:
+      Value [Option,Option...] Name (Regex)
+
+  It defines a column that will be in the resulting table.
+  """
   @enforce_keys [:name, :regex]
   defstruct [:name, :options, :regex]
 

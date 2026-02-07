@@ -1,10 +1,18 @@
 defmodule TextFSM.Template.State do
+  @moduledoc """
+  Represents a State in a TextFSM template.
+
+  A State is a named collection of Rules. The Engine starts in the 'Start' state.
+  Each line of input is matched against the rules in the current state.
+  """
   @enforce_keys [:name, :rules]
   defstruct [:name, :rules]
 
+  alias __MODULE__.Rule
+
   @type t() :: %__MODULE__{
           name: String.t(),
-          rules: [__MODULE__.Rule.t()]
+          rules: [Rule.t()]
         }
 
   import NimbleParsec

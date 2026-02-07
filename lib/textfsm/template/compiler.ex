@@ -1,8 +1,26 @@
 defmodule TextFSM.Template.Compiler do
+  @moduledoc """
+  Compiles a parsed TextFSM template.
+
+  The compilation process involves:
+  1.  Inlining value descriptors to their regex patterns in the rules of each state.
+  2.  Compiling the final string regular expressions into `Regex` structs.
+  """
   alias TextFSM.Template
   alias Template.State
   alias State.Rule
 
+  @doc """
+  Compiles the given template.
+
+  ## Parameters
+
+  * `template` - A `TextFSM.Template` struct.
+
+  ## Returns
+
+  * `TextFSM.Template` - A compiled template struct.
+  """
   @spec compile(Template.t()) :: Template.t()
   def compile(%Template{value_definitions: value_definitions, states: states} = template) do
     value_to_regex = Map.new(value_definitions, &{&1.name, &1.regex})

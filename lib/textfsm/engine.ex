@@ -1,4 +1,11 @@
 defmodule TextFSM.Engine do
+  @moduledoc """
+  The Engine is responsible for executing the TextFSM state machine against input text.
+
+  It maintains the current state (context), the accumulated data (memory), and the template rules.
+  The engine processes text line by line, matching against the rules of the current state,
+  and executing corresponding actions (recording data, transitioning states, etc.).
+  """
   alias TextFSM.Error
   alias __MODULE__.{Context, Memory}
   alias TextFSM.Template
@@ -21,6 +28,20 @@ defmodule TextFSM.Engine do
           lines: [String.t()]
         }
 
+  @doc """
+  Creates a new Engine instance.
+
+  Initializes the engine with the compiled template and the input text.
+
+  ## Parameters
+
+  * `template` - The compiled `TextFSM.Template`.
+  * `text` - The input text string.
+
+  ## Returns
+
+  * `TextFSM.Engine.t()`
+  """
   @spec new(Template.t(), String.t()) :: t()
   def new(%Template{value_definitions: value_definitions} = template, text) do
     %__MODULE__{
@@ -31,6 +52,20 @@ defmodule TextFSM.Engine do
     }
   end
 
+  @doc """
+  Runs the engine until completion.
+
+  It steps through the state machine processing lines until it halts (End state or EOF).
+  Finally, it returns the parsed data as a column-oriented table represented as a map from value names to columns.
+
+  ## Parameters
+
+  * `engine` - The initialized `TextFSM.Engine` struct.
+
+  ## Returns
+
+  * `table()` - The parsed data as a map of value names to lists of values (columns).
+  """
   @spec run(t()) :: table()
   def run(%__MODULE__{} = engine) do
     case step(engine) do
